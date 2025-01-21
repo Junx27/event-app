@@ -31,9 +31,9 @@ jobs:
       # Build Docker image
       - name: Build the Docker image
         run: |
-          docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/ticket-booking-app:2024.1.7
+          docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/event-app:v1.0.0
           docker images  # Debugging step to list the images
 
       # Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/ticket-booking-app:2024.1.7
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/event-app:v1.0.0
