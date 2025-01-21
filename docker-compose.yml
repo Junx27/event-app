@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: junx27/event-app:v1.0.0
     container_name: event_app
     ports:
       - "8080:8080"

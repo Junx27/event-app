@@ -18,9 +18,11 @@ func main() {
 	router.SetupAuthRouter(r, authService.(*service.AuthService))
 	router.SetupUserRouter(r, db)
 	router.SetupEventRouter(r, db)
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "pong",
+			"App Name": "Event App",
+			"Author":   "Junx",
+			"Version":  "1.0.0",
 		})
 	})
 	r.Run(":8080")
