@@ -1,4 +1,4 @@
-module guthub.com/Junx27/event-app
+module github.com/Junx27/event-app
 
 go 1.23.1
 

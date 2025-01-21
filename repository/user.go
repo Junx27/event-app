@@ -1,8 +1,8 @@
 package repository
 
 import (
+	"github.com/Junx27/event-app/entity"
 	"gorm.io/gorm"
-	"guthub.com/Junx27/event-app/entity"
 )
 
 type UserReopository struct {

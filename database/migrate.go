@@ -3,13 +3,14 @@ package database
 import (
 	"fmt"
 
+	"github.com/Junx27/event-app/entity"
 	"gorm.io/gorm"
-	"guthub.com/Junx27/event-app/entity"
 )
 
 func DBMigrator(db *gorm.DB) error {
 	entities := []interface{}{
 		&entity.User{},
+		&entity.Event{},
 	}
 	for _, entity := range entities {
 		if err := db.Migrator().DropTable(entity); err != nil {

@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
+	"github.com/Junx27/event-app/entity"
 	"github.com/gin-gonic/gin"
-	"guthub.com/Junx27/event-app/entity"
 )
 
 type UserHandler struct {

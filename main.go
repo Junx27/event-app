@@ -1,12 +1,12 @@
 package main
 
 import (
+	"github.com/Junx27/event-app/config"
+	"github.com/Junx27/event-app/database"
+	"github.com/Junx27/event-app/repository"
+	"github.com/Junx27/event-app/router"
+	"github.com/Junx27/event-app/service"
 	"github.com/gin-gonic/gin"
-	"guthub.com/Junx27/event-app/config"
-	"guthub.com/Junx27/event-app/database"
-	"guthub.com/Junx27/event-app/repository"
-	"guthub.com/Junx27/event-app/router"
-	"guthub.com/Junx27/event-app/service"
 )
 
 func main() {
@@ -17,6 +17,7 @@ func main() {
 	authService := service.NewAuthService(authRepository)
 	router.SetupAuthRouter(r, authService.(*service.AuthService))
 	router.SetupUserRouter(r, db)
+	router.SetupEventRouter(r, db)
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",

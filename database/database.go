@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Junx27/event-app/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"guthub.com/Junx27/event-app/config"
 )
 
 func Init(config *config.EnvConfig, DBMigrator func(*gorm.DB) error) *gorm.DB {

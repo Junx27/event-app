@@ -1,9 +1,9 @@
 package router
 
 import (
+	"github.com/Junx27/event-app/controller"
+	"github.com/Junx27/event-app/service"
 	"github.com/gin-gonic/gin"
-	"guthub.com/Junx27/event-app/controller"
-	"guthub.com/Junx27/event-app/service"
 )
 
 func SetupAuthRouter(r *gin.Engine, authService *service.AuthService) {

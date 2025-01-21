@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/Junx27/event-app/entity"
 	"gorm.io/gorm"
-	"guthub.com/Junx27/event-app/entity"
 )
 
 type AuthRepository struct {
