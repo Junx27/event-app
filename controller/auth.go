@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/Junx27/event-app/entity"
-	"github.com/Junx27/ticket-booking/helper"
+	"github.com/Junx27/event-app/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )

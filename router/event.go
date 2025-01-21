@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/Junx27/event-app/controller"
+	"github.com/Junx27/event-app/middleware"
 	"github.com/Junx27/event-app/repository"
-	"github.com/Junx27/ticket-booking/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

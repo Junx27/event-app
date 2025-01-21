@@ -9,7 +9,7 @@ import (
 
 	"github.com/Junx27/event-app/entity"
 	"github.com/Junx27/event-app/helper"
-	"github.com/Junx27/ticket-booking/util"
+	"github.com/Junx27/event-app/util"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
