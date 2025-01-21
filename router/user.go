@@ -13,6 +13,6 @@ func SetupUserRouter(r *gin.Engine, db *gorm.DB) {
 
 	userGroup := r.Group("/users")
 	{
-		userGroup.GET("/", userHandler.GetAllUser)
+		userGroup.GET("/", userHandler.GetMany)
 	}
 }

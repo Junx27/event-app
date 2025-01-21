@@ -15,8 +15,8 @@ func NewUserHandler(repository entity.UserReopository) *UserHandler {
 	return &UserHandler{repository: repository}
 }
 
-func (h *UserHandler) GetAllUser(ctx *gin.Context) {
-	users, err := h.repository.GetAll()
+func (h *UserHandler) GetMany(ctx *gin.Context) {
+	users, err := h.repository.GetMany()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

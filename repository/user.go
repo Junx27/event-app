@@ -13,7 +13,7 @@ func NewUserRepository(db *gorm.DB) entity.UserReopository {
 	return &UserReopository{db: db}
 }
 
-func (ur *UserReopository) GetAll() ([]*entity.User, error) {
+func (ur *UserReopository) GetMany() ([]*entity.User, error) {
 	var users []*entity.User
 	if err := ur.db.Find(&users).Error; err != nil {
 		return nil, err
