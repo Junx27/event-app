@@ -15,16 +15,22 @@ func NewEventRepository(db *gorm.DB) entity.EventRepository {
 	return &EventRepository{db: db}
 }
 
-func (r *EventRepository) GetMany(ctx context.Context) ([]*entity.Event, error) {
-	var events []*entity.Event
-	if err := r.db.Find(&events).Error; err != nil {
-		return nil, err
+func (r *EventRepository) GetMany(ctx context.Context, page, limit int) ([]*entity.EventResponse, int64, error) {
+	var events []*entity.EventResponse
+	var totalItems int64
+	if err := r.db.Model(&entity.Event{}).Count(&totalItems).Error; err != nil {
+		return nil, 0, err
 	}
-	return events, nil
+	offset := (page - 1) * limit
+	if err := r.db.Offset(offset).Limit(limit).Preload("User").Find(&events).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return events, totalItems, nil
 }
 
-func (r *EventRepository) GetOne(ctx context.Context, id uint) (*entity.Event, error) {
-	event := &entity.Event{}
+func (r *EventRepository) GetOne(ctx context.Context, id uint) (*entity.EventResponse, error) {
+	event := &entity.EventResponse{}
 	if res := r.db.Model(event).Where("id = ?", id).First(event); res.Error != nil {
 		return nil, res.Error
 	}

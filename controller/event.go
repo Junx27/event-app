@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 
@@ -18,13 +19,41 @@ func NewEventHandler(repository entity.EventRepository) *EventHandler {
 }
 
 func (h *EventHandler) GetMany(ctx *gin.Context) {
-	events, err := h.repository.GetMany(ctx)
+	page := ctx.DefaultQuery("page", "1")
+	limit := ctx.DefaultQuery("limit", "10")
+
+	pageInt, _ := strconv.Atoi(page)
+	limitInt, _ := strconv.Atoi(limit)
+
+	events, totalItems, err := h.repository.GetMany(ctx, pageInt, limitInt)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
 	}
+	totalPages := int(math.Ceil(float64(totalItems) / float64(limitInt)))
 
-	ctx.JSON(http.StatusOK, helper.SuccessResponse(("Fetch data successfully"), events))
+	if pageInt > totalPages {
+		pageInt = totalPages
+		events, _, err = h.repository.GetMany(ctx, pageInt, limitInt)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
+			return
+		}
+		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Page not found"))
+		return
+	}
+
+	pagination := map[string]interface{}{
+		"page":        pageInt,
+		"limit":       limitInt,
+		"total_items": totalItems,
+		"total_pages": totalPages,
+	}
+	responseData := map[string]interface{}{
+		"events":     events,
+		"pagination": pagination,
+	}
+	ctx.JSON(http.StatusOK, helper.SuccessResponse(("Fetch data successfully"), responseData))
 }
 
 func (h *EventHandler) GetOne(ctx *gin.Context) {
