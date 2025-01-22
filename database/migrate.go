@@ -11,6 +11,7 @@ func DBMigrator(db *gorm.DB) error {
 	entities := []interface{}{
 		&entity.User{},
 		&entity.Event{},
+		&entity.Ticket{},
 	}
 	for _, entity := range entities {
 		if err := db.Migrator().DropTable(entity); err != nil {

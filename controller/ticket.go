@@ -10,22 +10,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type EventHandler struct {
-	repository entity.EventRepository
+type TicketHandler struct {
+	repository entity.TicketRepository
 }
 
-func NewEventHandler(repository entity.EventRepository) *EventHandler {
-	return &EventHandler{repository: repository}
+func NewTicketHandler(repository entity.TicketRepository) *TicketHandler {
+	return &TicketHandler{repository: repository}
 }
 
-func (h *EventHandler) GetMany(ctx *gin.Context) {
+func (h *TicketHandler) GetMany(ctx *gin.Context) {
 	page := ctx.DefaultQuery("page", "1")
 	limit := ctx.DefaultQuery("limit", "10")
 
 	pageInt, _ := strconv.Atoi(page)
 	limitInt, _ := strconv.Atoi(limit)
 
-	events, totalItems, err := h.repository.GetMany(ctx, pageInt, limitInt)
+	tickets, totalItems, err := h.repository.GetMany(ctx, pageInt, limitInt)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
@@ -34,7 +34,7 @@ func (h *EventHandler) GetMany(ctx *gin.Context) {
 
 	if pageInt > totalPages {
 		pageInt = totalPages
-		events, _, err = h.repository.GetMany(ctx, pageInt, limitInt)
+		tickets, _, err = h.repository.GetMany(ctx, pageInt, limitInt)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 			return
@@ -42,24 +42,25 @@ func (h *EventHandler) GetMany(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Page not found"))
 		return
 	}
-	response := helper.PaginationResponse(events, pageInt, limitInt, totalPages, totalItems)
+
+	response := helper.PaginationResponse(tickets, pageInt, limitInt, totalPages, totalItems)
 	ctx.JSON(http.StatusOK, helper.SuccessResponse(("Fetch data successfully"), response))
 }
 
-func (h *EventHandler) GetOne(ctx *gin.Context) {
+func (h *TicketHandler) GetOne(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
-	event, err := h.repository.GetOne(ctx, uint(id))
+	ticket, err := h.repository.GetOne(ctx, uint(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helper.SuccessResponse(("Fetch data successfully"), event))
+	ctx.JSON(http.StatusOK, helper.SuccessResponse(("Fetch data successfully"), ticket))
 }
 
-func (h *EventHandler) CreateOne(ctx *gin.Context) {
-	event := &entity.Event{}
-	if err := ctx.ShouldBindJSON(&event); err != nil {
+func (h *TicketHandler) CreateOne(ctx *gin.Context) {
+	ticket := &entity.Ticket{}
+	if err := ctx.ShouldBindJSON(&ticket); err != nil {
 		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid input"))
 		return
 	}
@@ -72,39 +73,33 @@ func (h *EventHandler) CreateOne(ctx *gin.Context) {
 		})
 		return
 	}
-	event.UserID = userID
-	createdEvent, err := h.repository.CreateOne(ctx, event)
+	ticket.UserID = userID
+	createTicket, err := h.repository.CreateOne(ctx, ticket)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to create data"))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helper.SuccessResponse("Create data successfully", createdEvent))
+	ctx.JSON(http.StatusOK, helper.SuccessResponse("Create data successfully", createTicket))
 }
 
-func (h *EventHandler) UpdateOne(ctx *gin.Context) {
+func (h *TicketHandler) UpdateOne(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
-	event, err := h.repository.GetOne(ctx, uint(id))
+	ticket, err := h.repository.GetOne(ctx, uint(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
 	}
 
-	updateData := entity.Event{}
+	updateData := entity.Ticket{}
 	if err := ctx.ShouldBindJSON(&updateData); err != nil {
 		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid input"))
 		return
 	}
 	updateFields := map[string]interface{}{
-		"id":          event.ID,
-		"user_id":     event.UserID,
-		"title":       updateData.Title,
-		"description": updateData.Description,
-		"location":    updateData.Location,
-		"date":        updateData.Date,
-		"time":        updateData.Time,
-		"price":       updateData.Price,
-		"quota":       updateData.Quota,
+		"id":       ticket.ID,
+		"user_id":  ticket.UserID,
+		"event_id": ticket.EventID,
 	}
 
 	updatedEvent, err := h.repository.UpdateOne(ctx, uint(id), updateFields)
@@ -116,7 +111,7 @@ func (h *EventHandler) UpdateOne(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, helper.SuccessResponse("Update data successfully", updatedEvent))
 }
 
-func (h *EventHandler) DeleteOne(ctx *gin.Context) {
+func (h *TicketHandler) DeleteOne(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	err = h.repository.DeleteOne(ctx, uint(id))
 	if err != nil {

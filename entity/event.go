@@ -19,6 +19,7 @@ type Event struct {
 	Time        string       `json:"time" gorm:"not null"`
 	Price       int          `json:"price" gorm:"not null"`
 	Quota       int          `json:"quota" gorm:"not null"`
+	Status      string       `json:"status" gorm:"default:not yet"`
 	User        UserResponse `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 }
 
@@ -33,6 +34,7 @@ type EventResponse struct {
 	Time        string       `json:"time" gorm:"not null"`
 	Price       int          `json:"price" gorm:"not null"`
 	Quota       int          `json:"quota" gorm:"not null"`
+	Status      string       `json:"status" gorm:"default:not yet"`
 	User        UserResponse `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 }
 
