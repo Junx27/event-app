@@ -18,7 +18,7 @@ func SetupTicketRouter(r *gin.Engine, db *gorm.DB) {
 		eventGroup.GET("", ticketHandler.GetMany)
 		eventGroup.GET("/:id", ticketHandler.GetOne)
 		eventGroup.POST("", ticketHandler.CreateOne)
-		eventGroup.PUT("/:id", ticketHandler.UpdateOne)
+		eventGroup.PUT("/payment/:id", ticketHandler.UpdateOne)
 		eventGroup.DELETE("/:id", ticketHandler.DeleteOne)
 	}
 }

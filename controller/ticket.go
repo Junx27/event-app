@@ -90,16 +90,13 @@ func (h *TicketHandler) UpdateOne(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
 	}
-
-	updateData := entity.Ticket{}
-	if err := ctx.ShouldBindJSON(&updateData); err != nil {
-		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid input"))
-		return
-	}
 	updateFields := map[string]interface{}{
 		"id":       ticket.ID,
 		"user_id":  ticket.UserID,
 		"event_id": ticket.EventID,
+		"quantity": ticket.Quantity,
+		"payment":  true,
+		"usage":    ticket.Usage,
 	}
 
 	updatedEvent, err := h.repository.UpdateOne(ctx, uint(id), updateFields)

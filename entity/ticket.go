@@ -10,12 +10,13 @@ func (BaseModelTiket) TableName() string {
 
 type Ticket struct {
 	BaseModelTiket
-	ID      uint         `json:"id" gorm:"primaryKey"`
-	UserID  uint         `json:"user_id" gorm:"not null"`
-	EventID uint         `json:"event_id" gorm:"not null"`
-	Payment bool         `json:"payment" gorm:"not null"`
-	Usage   bool         `json:"usage" gorm:"not null"`
-	User    UserResponse `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	ID       uint         `json:"id" gorm:"primaryKey"`
+	UserID   uint         `json:"user_id" gorm:"not null"`
+	EventID  uint         `json:"event_id" gorm:"not null"`
+	Quantity int          `json:"quantity" gorm:"not null"`
+	Payment  bool         `json:"payment" gorm:"not null"`
+	Usage    bool         `json:"usage" gorm:"not null"`
+	User     UserResponse `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 }
 
 type TicketResponse struct {
