@@ -199,7 +199,7 @@ func AccessPermission(repo repository.HasUserID) gin.HandlerFunc {
 				return
 			}
 		} else {
-			data, err := repo.GetManyByUser(ctx, userID)
+			data, err := repo.GetManyByUser(ctx, userID, 0, 0)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, gin.H{
 					"status":  "fail",

@@ -15,7 +15,6 @@ func NewTicketService(repository entity.TicketRepository) *TicketService {
 	return &TicketService{repository: repository}
 
 }
-
 func (s *TicketService) TicketCancel(ctx context.Context, id uint) (*entity.Ticket, *entity.TicketResponse, error) {
 	ticket, err := s.repository.GetOne(ctx, id)
 	if err != nil {

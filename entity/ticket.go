@@ -33,7 +33,8 @@ type TicketResponse struct {
 }
 
 type TicketRepository interface {
-	GetMany(ctx context.Context, page, limit int) ([]*TicketResponse, int64, error)
+	GetManyAdmin(ctx context.Context, page, limit int) ([]*TicketResponse, int64, error)
+	GetMany(ctx context.Context, userId uint, page, limit int) ([]*TicketResponse, int64, error)
 	GetOne(ctx context.Context, id uint) (*TicketResponse, error)
 	CreateOne(ctx context.Context, ticket *Ticket) (*Ticket, error)
 	UpdateOne(ctx context.Context, id uint, updateData map[string]interface{}) (*Ticket, error)

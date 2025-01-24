@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Junx27/event-app/entity"
 	"gorm.io/gorm"
@@ -15,7 +16,43 @@ func NewTicketRepository(db *gorm.DB) entity.TicketRepository {
 	return &TicketRepository{db: db}
 }
 
-func (r *TicketRepository) GetMany(ctx context.Context, page, limit int) ([]*entity.TicketResponse, int64, error) {
+func (r *TicketRepository) GetUserID(id uint) (uint, error) {
+	var ticket entity.TicketResponse
+	if err := r.db.First(&ticket, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, errors.New("ticket not found")
+		}
+		return 0, err
+	}
+	return ticket.UserID, nil
+}
+
+func (r *TicketRepository) GetManyByUser(ctx context.Context, userID uint, page, limit int) ([]interface{}, error) {
+	tickets, _, err := r.GetMany(ctx, userID, page, limit)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]interface{}, len(tickets))
+	for i, ticket := range tickets {
+		result[i] = ticket
+	}
+	return result, nil
+}
+
+func (r *TicketRepository) GetMany(ctx context.Context, userID uint, page, limit int) ([]*entity.TicketResponse, int64, error) {
+	var tickets []*entity.TicketResponse
+	var totalItems int64
+	if err := r.db.Model(&entity.Ticket{}).Count(&totalItems).Error; err != nil {
+		return nil, 0, err
+	}
+	offset := (page - 1) * limit
+	if err := r.db.Offset(offset).Limit(limit).Preload("User").Where("user_id = ?", userID).Find(&tickets).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return tickets, totalItems, nil
+}
+func (r *TicketRepository) GetManyAdmin(ctx context.Context, page, limit int) ([]*entity.TicketResponse, int64, error) {
 	var tickets []*entity.TicketResponse
 	var totalItems int64
 	if err := r.db.Model(&entity.Ticket{}).Count(&totalItems).Error; err != nil {

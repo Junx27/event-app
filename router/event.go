@@ -17,8 +17,8 @@ func SetupEventRouter(r *gin.Engine, db *gorm.DB) {
 	{
 		eventGroup.GET("", eventHandler.GetMany)
 		eventGroup.GET("/:id", eventHandler.GetOne)
-		eventGroup.POST("", eventHandler.CreateOne)
-		eventGroup.PUT("/:id", eventHandler.UpdateOne)
-		eventGroup.DELETE("/:id", eventHandler.DeleteOne)
+		eventGroup.POST("", middleware.RoleRequired("admin"), eventHandler.CreateOne)
+		eventGroup.PUT("/:id", middleware.RoleRequired("admin"), eventHandler.UpdateOne)
+		eventGroup.DELETE("/:id", middleware.RoleRequired("admin"), eventHandler.DeleteOne)
 	}
 }

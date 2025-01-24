@@ -12,16 +12,18 @@ import (
 func SetupTicketRouter(r *gin.Engine, db *gorm.DB, ticketService *service.TicketService) {
 	ticketRepository := repository.NewTicketRepository(db)
 	ticketHandler := controller.NewTicketHandler(ticketRepository, ticketService)
+	ticketMiddleware := ticketRepository.(*repository.TicketRepository)
 
 	eventGroup := r.Group("/tickets")
 	eventGroup.Use(middleware.AuthProtected(db))
 	{
-		eventGroup.GET("", ticketHandler.GetMany)
-		eventGroup.GET("/:id", ticketHandler.GetOne)
-		eventGroup.POST("", ticketHandler.CreateOne)
-		eventGroup.PATCH("/payment/:id", ticketHandler.PaymentOne)
-		eventGroup.PATCH("/cancel/:id", ticketHandler.CancelOne)
-		eventGroup.PATCH("/usage/:id", ticketHandler.UsageTicket)
-		eventGroup.DELETE("/:id", ticketHandler.DeleteOne)
+		eventGroup.GET("/booked", middleware.RoleRequired("admin"), ticketHandler.GetManyAdmin)
+		eventGroup.GET("", middleware.AccessPermission(ticketMiddleware), ticketHandler.GetMany)
+		eventGroup.GET("/:id", middleware.AccessPermission(ticketMiddleware), ticketHandler.GetOne)
+		eventGroup.POST("", middleware.RoleRequired("user"), ticketHandler.CreateOne)
+		eventGroup.PATCH("/payment/:id", middleware.AccessPermission(ticketMiddleware), middleware.RoleRequired("user"), ticketHandler.PaymentOne)
+		eventGroup.PATCH("/cancel/:id", middleware.AccessPermission(ticketMiddleware), middleware.RoleRequired("user"), ticketHandler.CancelOne)
+		eventGroup.PATCH("/usage/:id", middleware.AccessPermission(ticketMiddleware), middleware.RoleRequired("user"), ticketHandler.UsageTicket)
+		eventGroup.DELETE("/:id", middleware.RoleRequired("admin"), ticketHandler.DeleteOne)
 	}
 }

@@ -20,13 +20,21 @@ func NewTicketHandler(repository entity.TicketRepository, service entity.TicketS
 }
 
 func (h *TicketHandler) GetMany(ctx *gin.Context) {
+	userID, err := helper.GetUserIDFromCookie(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+		return
+	}
 	page := ctx.DefaultQuery("page", "1")
 	limit := ctx.DefaultQuery("limit", "10")
 
 	pageInt, _ := strconv.Atoi(page)
 	limitInt, _ := strconv.Atoi(limit)
 
-	tickets, totalItems, err := h.repository.GetMany(ctx, pageInt, limitInt)
+	tickets, totalItems, err := h.repository.GetMany(ctx.Request.Context(), userID, pageInt, limitInt)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
@@ -35,7 +43,36 @@ func (h *TicketHandler) GetMany(ctx *gin.Context) {
 
 	if pageInt > totalPages {
 		pageInt = totalPages
-		tickets, _, err = h.repository.GetMany(ctx, pageInt, limitInt)
+		tickets, _, err = h.repository.GetMany(ctx.Request.Context(), userID, pageInt, limitInt)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
+			return
+		}
+		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Page not found"))
+		return
+	}
+
+	response := helper.PaginationResponse(tickets, pageInt, limitInt, totalPages, totalItems)
+	ctx.JSON(http.StatusOK, helper.SuccessResponse(("Fetch data successfully"), response))
+}
+
+func (h *TicketHandler) GetManyAdmin(ctx *gin.Context) {
+	page := ctx.DefaultQuery("page", "1")
+	limit := ctx.DefaultQuery("limit", "10")
+
+	pageInt, _ := strconv.Atoi(page)
+	limitInt, _ := strconv.Atoi(limit)
+
+	tickets, totalItems, err := h.repository.GetManyAdmin(ctx.Request.Context(), pageInt, limitInt)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
+		return
+	}
+	totalPages := int(math.Ceil(float64(totalItems) / float64(limitInt)))
+
+	if pageInt > totalPages {
+		pageInt = totalPages
+		tickets, _, err = h.repository.GetManyAdmin(ctx.Request.Context(), pageInt, limitInt)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 			return
