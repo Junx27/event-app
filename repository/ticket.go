@@ -31,7 +31,7 @@ func (r *TicketRepository) GetMany(ctx context.Context, page, limit int) ([]*ent
 
 func (r *TicketRepository) GetOne(ctx context.Context, id uint) (*entity.TicketResponse, error) {
 	ticket := &entity.TicketResponse{}
-	if res := r.db.Model(ticket).Where("id = ?", id).First(ticket); res.Error != nil {
+	if res := r.db.Model(ticket).Where("id = ?", id).Preload("User").First(ticket); res.Error != nil {
 		return nil, res.Error
 	}
 

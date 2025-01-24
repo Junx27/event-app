@@ -12,10 +12,11 @@ import (
 
 type TicketHandler struct {
 	repository entity.TicketRepository
+	service    entity.TicketService
 }
 
-func NewTicketHandler(repository entity.TicketRepository) *TicketHandler {
-	return &TicketHandler{repository: repository}
+func NewTicketHandler(repository entity.TicketRepository, service entity.TicketService) *TicketHandler {
+	return &TicketHandler{repository: repository, service: service}
 }
 
 func (h *TicketHandler) GetMany(ctx *gin.Context) {
@@ -83,29 +84,46 @@ func (h *TicketHandler) CreateOne(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, helper.SuccessResponse("Create data successfully", createTicket))
 }
 
-func (h *TicketHandler) UpdateOne(ctx *gin.Context) {
+func (h *TicketHandler) PaymentOne(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
-	ticket, err := h.repository.GetOne(ctx, uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid ticket ID"))
+		return
+	}
+	updateTicket, _, err := h.service.TicketPayment(ctx, uint(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
 	}
-	updateFields := map[string]interface{}{
-		"id":       ticket.ID,
-		"user_id":  ticket.UserID,
-		"event_id": ticket.EventID,
-		"quantity": ticket.Quantity,
-		"payment":  true,
-		"usage":    ticket.Usage,
-	}
+	ctx.JSON(http.StatusOK, helper.SuccessResponse("Update data successfully", updateTicket))
+}
 
-	updatedEvent, err := h.repository.UpdateOne(ctx, uint(id), updateFields)
+func (h *TicketHandler) CancelOne(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to update data"))
+		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid ticket ID"))
 		return
 	}
+	updateTicket, _, err := h.service.TicketCancel(ctx, uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
+		return
+	}
+	ctx.JSON(http.StatusOK, helper.SuccessResponse("Update data successfully", updateTicket))
+}
 
-	ctx.JSON(http.StatusOK, helper.SuccessResponse("Update data successfully", updatedEvent))
+func (h *TicketHandler) UsageTicket(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid ticket ID"))
+		return
+	}
+	updateTicket, _, err := h.service.TicketUsage(ctx, uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
+		return
+	}
+	ctx.JSON(http.StatusOK, helper.SuccessResponse("Update data successfully", updateTicket))
 }
 
 func (h *TicketHandler) DeleteOne(ctx *gin.Context) {
