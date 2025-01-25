@@ -18,6 +18,7 @@ type Ticket struct {
 	Payment  bool         `json:"payment" gorm:"default:false"`
 	Usage    bool         `json:"usage" gorm:"default:false"`
 	User     UserResponse `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	Event    Event        `json:"-" gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE"`
 }
 
 type TicketResponse struct {
@@ -30,11 +31,13 @@ type TicketResponse struct {
 	Payment  bool         `json:"payment" gorm:"default:false"`
 	Usage    bool         `json:"usage" gorm:"default:false"`
 	User     UserResponse `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	Event    Event        `json:"event" gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE"`
 }
 
 type TicketRepository interface {
 	GetManyAdmin(ctx context.Context, page, limit int) ([]*TicketResponse, int64, error)
 	GetMany(ctx context.Context, userId uint, page, limit int) ([]*TicketResponse, int64, error)
+	GetManyByEvent(ctx context.Context, eventId uint, page, limit int) ([]*TicketResponse, int64, error)
 	GetOne(ctx context.Context, id uint) (*TicketResponse, error)
 	CreateOne(ctx context.Context, ticket *Ticket) (*Ticket, error)
 	UpdateOne(ctx context.Context, id uint, updateData map[string]interface{}) (*Ticket, error)

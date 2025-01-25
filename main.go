@@ -15,11 +15,14 @@ func main() {
 	r := gin.Default()
 	authRepository := repository.NewAuthRepository(db)
 	authService := service.NewAuthService(authRepository)
-	ticketSevice := service.NewTicketService(repository.NewTicketRepository(db))
+	ticketRepository := repository.NewTicketRepository(db)
+	eventRepository := repository.NewEventRepository(db)
+	ticketSevice := service.NewTicketService(ticketRepository, eventRepository)
 	router.SetupAuthRouter(r, authService.(*service.AuthService))
 	router.SetupUserRouter(r, db)
 	router.SetupEventRouter(r, db)
 	router.SetupTicketRouter(r, db, ticketSevice)
+	router.SetupReportRouter(r, ticketSevice)
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"App Name": "Event App",

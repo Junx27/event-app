@@ -8,6 +8,18 @@ func (BaseModelEvent) TableName() string {
 	return "events"
 }
 
+type SummaryReport struct {
+	TotalTicketsSold int `json:"total_tickets_sold"`
+	TotalRevenue     int `json:"total_revenue"`
+	TotalEvents      int `json:"total_events"`
+}
+type EventReport struct {
+	EventID      uint   `json:"event_id"`
+	EventTitle   string `json:"event_title"`
+	TotalTickets int    `json:"total_tickets"`
+	TotalRevenue int    `json:"total_revenue"`
+}
+
 type Event struct {
 	BaseModelEvent
 	ID          uint         `json:"id" gorm:"primaryKey"`

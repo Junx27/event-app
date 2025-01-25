@@ -39,36 +39,39 @@ func (r *TicketRepository) GetManyByUser(ctx context.Context, userID uint, page,
 	return result, nil
 }
 
-func (r *TicketRepository) GetMany(ctx context.Context, userID uint, page, limit int) ([]*entity.TicketResponse, int64, error) {
+func (r *TicketRepository) GetMany(ctx context.Context, userId uint, page, limit int) ([]*entity.TicketResponse, int64, error) {
 	var tickets []*entity.TicketResponse
-	var totalItems int64
-	if err := r.db.Model(&entity.Ticket{}).Count(&totalItems).Error; err != nil {
+	var total int64
+	err := r.db.Model(&entity.Ticket{}).Where("user_id = ? AND payment = ?", userId, true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
+	if err != nil {
 		return nil, 0, err
 	}
-	offset := (page - 1) * limit
-	if err := r.db.Offset(offset).Limit(limit).Preload("User").Where("user_id = ?", userID).Find(&tickets).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return tickets, totalItems, nil
+	return tickets, total, nil
 }
+
+func (r *TicketRepository) GetManyByEvent(ctx context.Context, eventId uint, page, limit int) ([]*entity.TicketResponse, int64, error) {
+	var tickets []*entity.TicketResponse
+	var total int64
+	err := r.db.Model(&entity.Ticket{}).Where("event_id = ? AND payment = ?", eventId, true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return tickets, total, nil
+}
+
 func (r *TicketRepository) GetManyAdmin(ctx context.Context, page, limit int) ([]*entity.TicketResponse, int64, error) {
 	var tickets []*entity.TicketResponse
-	var totalItems int64
-	if err := r.db.Model(&entity.Ticket{}).Count(&totalItems).Error; err != nil {
+	var total int64
+	err := r.db.Model(&entity.Ticket{}).Where("payment = ?", true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
+	if err != nil {
 		return nil, 0, err
 	}
-	offset := (page - 1) * limit
-	if err := r.db.Offset(offset).Limit(limit).Preload("User").Find(&tickets).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return tickets, totalItems, nil
+	return tickets, total, nil
 }
 
 func (r *TicketRepository) GetOne(ctx context.Context, id uint) (*entity.TicketResponse, error) {
 	ticket := &entity.TicketResponse{}
-	if res := r.db.Model(ticket).Where("id = ?", id).Preload("User").First(ticket); res.Error != nil {
+	if res := r.db.Model(ticket).Where("id = ?", id).Preload("User").Preload("Event").First(ticket); res.Error != nil {
 		return nil, res.Error
 	}
 
