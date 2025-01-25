@@ -118,6 +118,15 @@ func (h *EventHandler) UpdateOne(ctx *gin.Context) {
 
 func (h *EventHandler) DeleteOne(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
+	event, err := h.repository.GetOne(ctx, uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
+		return
+	}
+	if event.Status == "available" || event.Status == "sold out" {
+		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Event has been processed"))
+		return
+	}
 	err = h.repository.DeleteOne(ctx, uint(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to delete data"))

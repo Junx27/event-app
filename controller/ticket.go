@@ -112,6 +112,17 @@ func (h *TicketHandler) CreateOne(ctx *gin.Context) {
 		return
 	}
 	ticket.UserID = userID
+
+	err = h.service.CheckEvent(ctx, ticket.EventID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Quantity not enough"))
+		return
+	}
+	err = h.service.UpdateEvent(ctx, ticket.EventID, ticket.Quantity)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to update event"))
+		return
+	}
 	createTicket, err := h.repository.CreateOne(ctx, ticket)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to create data"))

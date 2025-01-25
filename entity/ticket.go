@@ -45,6 +45,8 @@ type TicketRepository interface {
 }
 
 type TicketService interface {
+	CheckEvent(ctx context.Context, id uint) error
+	UpdateEvent(ctx context.Context, id uint, qty int) error
 	TicketCancel(ctx context.Context, id uint) (*Ticket, *TicketResponse, error)
 	TicketPayment(ctx context.Context, id uint) (*Ticket, *TicketResponse, error)
 	TicketUsage(ctx context.Context, id uint) (*Ticket, *TicketResponse, error)
