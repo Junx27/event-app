@@ -42,7 +42,7 @@ func (r *TicketRepository) GetManyByUser(ctx context.Context, userID uint, page,
 func (r *TicketRepository) GetMany(ctx context.Context, userId uint, page, limit int) ([]*entity.TicketResponse, int64, error) {
 	var tickets []*entity.TicketResponse
 	var total int64
-	err := r.db.Model(&entity.Ticket{}).Where("user_id = ? AND payment = ?", userId, true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
+	err := r.db.Model(&entity.Ticket{}).Preload("User").Preload("Event").Where("user_id = ? AND payment = ?", userId, true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
 	if err != nil {
 		return nil, 0, err
 	}
@@ -52,7 +52,7 @@ func (r *TicketRepository) GetMany(ctx context.Context, userId uint, page, limit
 func (r *TicketRepository) GetManyByEvent(ctx context.Context, eventId uint, page, limit int) ([]*entity.TicketResponse, int64, error) {
 	var tickets []*entity.TicketResponse
 	var total int64
-	err := r.db.Model(&entity.Ticket{}).Where("event_id = ? AND payment = ?", eventId, true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
+	err := r.db.Model(&entity.Ticket{}).Preload("User").Preload("Event").Where("event_id = ? AND payment = ?", eventId, true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
 	if err != nil {
 		return nil, 0, err
 	}
@@ -62,7 +62,7 @@ func (r *TicketRepository) GetManyByEvent(ctx context.Context, eventId uint, pag
 func (r *TicketRepository) GetManyAdmin(ctx context.Context, page, limit int) ([]*entity.TicketResponse, int64, error) {
 	var tickets []*entity.TicketResponse
 	var total int64
-	err := r.db.Model(&entity.Ticket{}).Where("payment = ?", true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
+	err := r.db.Model(&entity.Ticket{}).Preload("User").Preload("Event").Where("payment = ?", true).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&tickets).Error
 	if err != nil {
 		return nil, 0, err
 	}

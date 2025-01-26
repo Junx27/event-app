@@ -132,7 +132,7 @@ func (s *TicketService) GetSummaryReport(ctx context.Context) (*entity.SummaryRe
 		return nil, err
 	}
 
-	_, total, err := s.eventRepo.GetMany(ctx, 1, 100)
+	_, total, err := s.eventRepo.GetMany(ctx, 1, 100, "", "", "")
 	if err != nil {
 		return nil, err
 	}

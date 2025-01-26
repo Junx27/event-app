@@ -21,11 +21,14 @@ func NewEventHandler(repository entity.EventRepository) *EventHandler {
 func (h *EventHandler) GetMany(ctx *gin.Context) {
 	page := ctx.DefaultQuery("page", "1")
 	limit := ctx.DefaultQuery("limit", "10")
+	nameFilter := ctx.DefaultQuery("name", "")
+	locationFilter := ctx.DefaultQuery("location", "")
+	categoryFilter := ctx.DefaultQuery("category", "")
 
 	pageInt, _ := strconv.Atoi(page)
 	limitInt, _ := strconv.Atoi(limit)
 
-	events, totalItems, err := h.repository.GetMany(ctx, pageInt, limitInt)
+	events, totalItems, err := h.repository.GetMany(ctx, pageInt, limitInt, nameFilter, locationFilter, categoryFilter)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
@@ -34,7 +37,7 @@ func (h *EventHandler) GetMany(ctx *gin.Context) {
 
 	if pageInt > totalPages {
 		pageInt = totalPages
-		events, _, err = h.repository.GetMany(ctx, pageInt, limitInt)
+		events, _, err = h.repository.GetMany(ctx, pageInt, limitInt, nameFilter, locationFilter, categoryFilter)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 			return
@@ -99,12 +102,14 @@ func (h *EventHandler) UpdateOne(ctx *gin.Context) {
 		"id":          event.ID,
 		"user_id":     event.UserID,
 		"title":       updateData.Title,
+		"category":    updateData.Category,
 		"description": updateData.Description,
 		"location":    updateData.Location,
 		"date":        updateData.Date,
 		"time":        updateData.Time,
 		"price":       updateData.Price,
 		"quota":       updateData.Quota,
+		"status":      event.Status,
 	}
 
 	updatedEvent, err := h.repository.UpdateOne(ctx, uint(id), updateFields)

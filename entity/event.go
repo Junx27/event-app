@@ -25,6 +25,7 @@ type Event struct {
 	ID          uint         `json:"id" gorm:"primaryKey"`
 	UserID      uint         `json:"user_id" gorm:"not null"`
 	Title       string       `json:"title" gorm:"not null"`
+	Category    string       `json:"category" gorm:"not null"`
 	Description string       `json:"description" gorm:"not null"`
 	Location    string       `json:"location" gorm:"not null"`
 	Date        string       `json:"date" gorm:"not null"`
@@ -40,6 +41,7 @@ type EventResponse struct {
 	ID          uint         `json:"id" gorm:"primaryKey"`
 	UserID      uint         `json:"user_id" gorm:"not null"`
 	Title       string       `json:"title" gorm:"not null"`
+	Category    string       `json:"category" gorm:"not null"`
 	Description string       `json:"description" gorm:"not null"`
 	Location    string       `json:"location" gorm:"not null"`
 	Date        string       `json:"date" gorm:"not null"`
@@ -51,7 +53,7 @@ type EventResponse struct {
 }
 
 type EventRepository interface {
-	GetMany(ctx context.Context, page, limit int) ([]*EventResponse, int64, error)
+	GetMany(ctx context.Context, page, limit int, nameFilter, locationFilter, categoryFilter string) ([]*EventResponse, int64, error)
 	GetOne(ctx context.Context, id uint) (*EventResponse, error)
 	CreateOne(ctx context.Context, event *Event) (*Event, error)
 	UpdateOne(ctx context.Context, id uint, updateData map[string]interface{}) (*Event, error)
