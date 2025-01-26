@@ -18,7 +18,7 @@ docker compose down
 docker pull junx27/event-app:v1.0.0
 ```
 
-# Ticket Booking Documentation
+# Documentation
 
 - [API Documentation](https://documenter.getpostman.com/view/26920342/2sAYQgfnka)
 
